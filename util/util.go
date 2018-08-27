@@ -2,7 +2,7 @@ package util
 
 import (
 	"fmt"
-	"github.com/kelseyhightower/confd/log"
+	"github.com/CBike1103/confd/log"
 	"os"
 	"path"
 	"path/filepath"
