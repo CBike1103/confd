@@ -15,9 +15,9 @@ import (
 	"text/template"
 
 	"github.com/BurntSushi/toml"
-	"github.com/coreos/etcd/mvcc/mvccpb"
 	"github.com/CBike1103/confd/backends"
 	"github.com/CBike1103/confd/log"
+	"github.com/CBike1103/confd/store"
 	util "github.com/CBike1103/confd/util"
 	"github.com/kelseyhightower/memkv"
 	"github.com/xordataexchange/crypt/encoding/secconf"
@@ -42,26 +42,25 @@ type TemplateResourceConfig struct {
 
 // TemplateResource is the representation of a parsed template resource.
 type TemplateResource struct {
-	CheckCmd         string `toml:"check_cmd"`
-	Dest             string
-	FileMode         os.FileMode
-	Gid              int
-	Keys             []string
-	Mode             string
-	Prefix           string
-	ReloadCmd        string `toml:"reload_cmd"`
-	Src              string
-	StageFile        *os.File
-	Uid              int
-	funcMap          map[string]interface{}
-	lastIndex        uint64
-	keepStageFile    bool
-	noop             bool
-	store            memkv.Store
-	storeWithVersion map[string]*mvccpb.KeyValue
-	storeClient      backends.StoreClient
-	syncOnly         bool
-	PGPPrivateKey    []byte
+	CheckCmd      string `toml:"check_cmd"`
+	Dest          string
+	FileMode      os.FileMode
+	Gid           int
+	Keys          []string
+	Mode          string
+	Prefix        string
+	ReloadCmd     string `toml:"reload_cmd"`
+	Src           string
+	StageFile     *os.File
+	Uid           int
+	funcMap       map[string]interface{}
+	lastIndex     uint64
+	keepStageFile bool
+	noop          bool
+	store         store.Store
+	storeClient   backends.StoreClient
+	syncOnly      bool
+	PGPPrivateKey []byte
 }
 
 var ErrEmptySrc = errors.New("empty src template")
@@ -87,7 +86,7 @@ func NewTemplateResource(path string, config Config) (*TemplateResource, error) 
 	tr.noop = config.Noop
 	tr.storeClient = config.StoreClient
 	tr.funcMap = newFuncMap()
-	tr.store = memkv.New()
+	tr.store = store.New()
 	tr.syncOnly = config.SyncOnly
 	addFuncs(tr.funcMap, tr.store.FuncMap)
 

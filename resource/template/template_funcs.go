@@ -51,7 +51,12 @@ func newFuncMap() map[string]interface{} {
 	m["mul"] = func(a, b int) int { return a * b }
 	m["seq"] = Seq
 	m["atoi"] = strconv.Atoi
+	m["itoa"] = formatInt
 	return m
+}
+
+func formatInt(i int64) string {
+	return strconv.FormatInt(i, 10)
 }
 
 func addFuncs(out, in map[string]interface{}) {

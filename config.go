@@ -120,6 +120,10 @@ func initConfig() error {
 	}
 
 	// Update BackendNodes from SRV records.
+	if config.Backend != "etcdv3" {
+		log.Info("Set backend to 'etcdv3'. This is an Etcdv3 only version.")
+		config.Backend = "etcdv3"
+	}
 	if config.Backend != "env" && config.SRVRecord != "" {
 		log.Info("SRV record set to " + config.SRVRecord)
 		srvNodes, err := getBackendNodesFromSRV(config.SRVRecord)
@@ -139,25 +143,7 @@ func initConfig() error {
 		config.BackendNodes = srvNodes
 	}
 	if len(config.BackendNodes) == 0 {
-		switch config.Backend {
-		case "consul":
-			config.BackendNodes = []string{"127.0.0.1:8500"}
-		case "etcd":
-			peerstr := os.Getenv("ETCDCTL_PEERS")
-			if len(peerstr) > 0 {
-				config.BackendNodes = strings.Split(peerstr, ",")
-			} else {
-				config.BackendNodes = []string{"http://127.0.0.1:4001"}
-			}
-		case "etcdv3":
-			config.BackendNodes = []string{"127.0.0.1:2379"}
-		case "redis":
-			config.BackendNodes = []string{"127.0.0.1:6379"}
-		case "vault":
-			config.BackendNodes = []string{"http://127.0.0.1:8200"}
-		case "zookeeper":
-			config.BackendNodes = []string{"127.0.0.1:2181"}
-		}
+		config.BackendNodes = []string{"127.0.0.1:2379"}
 	}
 	// Initialize the storage client
 	log.Info("Backend set to " + config.Backend)
